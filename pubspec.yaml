@@ -1,0 +1,65 @@
+name: esports
+description: "A Flutter project for esports players."
+
+# Prevent accidental publishing to pub.dev
+publish_to: 'none' # Remove this line if you want to publish
+
+# Version and build number for your application
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Firebase dependencies
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.3
+  cloud_firestore: ^5.5.0
+  firebase_storage: ^12.3.6
+  firebase_analytics: ^11.3.5
+
+  # State management
+  provider: ^6.0.0
+
+  # Navigation and routing
+  go_router: ^14.6.1
+
+  # UI Enhancements
+  google_fonts: ^6.2.1
+  fluttertoast: ^8.0.9 # Updated version for compatibility
+  cached_network_image: ^3.2.3 # Compatible version
+
+  # Form validation
+  form_builder_validators: ^11.0.0 # Validation utilities
+
+  # HTTP requests
+  http: ^1.2.0
+
+  # Utilities
+  shared_preferences: ^2.2.0
+  intl: ^0.19.0
+  image_picker: ^1.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Assets (if you use any assets like images, fonts, etc.)
+  assets:
+    - assets/images/ # All images in this folder
+    # Add more images here as needed
+
+  # Fonts (if you plan to include custom fonts)
+  # fonts:
+  #   - family: Roboto
+  #     fonts:
+  #       - asset: fonts/Roboto-Regular.ttf
+  #       - asset: fonts/Roboto-Bold.ttf

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "731624379189",
+    "project_id": "esports-4b102",
+    "storage_bucket": "esports-4b102.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:731624379189:android:57ba934387291108eaf27c",
+        "android_client_info": {
+          "package_name": "com.esports.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaoFW5Wx47KeCeabR-pvAYAhrfcocuqd0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
