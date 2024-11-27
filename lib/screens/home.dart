@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'create.dart'; // Import the CreatePage here
+import 'create.dart'; // Import CreatePage here
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final List<Map<String, String>> videos; // Accept list of video data
+
+  const HomePage({super.key, required this.videos}); // Constructor to receive videos
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -13,6 +15,7 @@ class _HomePageState extends State<HomePage> {
   List<bool> isFollowing = [false, false]; // For two gamers in this example
   List<int> viewCounts = [0, 0]; // Initializing view count for each gamer
 
+  // Handle item selection in BottomNavigationBar
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -22,10 +25,18 @@ class _HomePageState extends State<HomePage> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const CreatePage()),
-      );
+      ).then((newVideo) {
+        if (newVideo != null) {
+          // Add the new video data to the list and update the UI
+          setState(() {
+            widget.videos.add(newVideo);
+          });
+        }
+      });
     }
   }
 
+  // Increment view count for a video
   void _incrementViewCount(int index) {
     setState(() {
       viewCounts[index] += 1; // Increment the view count
@@ -59,10 +70,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: ListView(
-        children: [
-          buildGamerTile(0, 'Harsh', viewCounts[0], 'assets/images/bgmi1.jpg'),
-          buildGamerTile(1, 'Malhar', viewCounts[1], 'assets/images/gtav.jpg'),
-        ],
+        children: widget.videos.isEmpty
+            ? [Center(child: Text("No videos yet!"))] // Display a message if there are no videos
+            : widget.videos.map((video) {
+                return buildVideoCard(video['title']!, video['thumbnail']!, video['url']!);
+              }).toList(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -91,20 +103,21 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Method to build the individual gamer tile with title below video
-  Widget buildGamerTile(int index, String username, int views, String imageUrl) {
-    // Titles for the videos
-    final titles = ['BGMI Video', 'GTA V Video'];
-
+  // Method to build the individual video card with title below video
+  Widget buildVideoCard(String title, String thumbnailUrl, String videoUrl) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
         child: Column(
           children: [
             GestureDetector(
-              onTap: () => _incrementViewCount(index), // Increment views when image is tapped
-              child: Image.asset(
-                imageUrl,
+              onTap: () {
+                // This is where you can add functionality for tapping the video
+                print('Video tapped: $title');
+                // You can add code to navigate to a video detail page or play video here
+              },
+              child: Image.network(
+                thumbnailUrl,
                 errorBuilder: (context, error, stackTrace) =>
                     const Icon(Icons.broken_image, size: 100),
               ),
@@ -113,7 +126,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                titles[index], // Display title based on index
+                title,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -129,24 +142,25 @@ class _HomePageState extends State<HomePage> {
                     child: Icon(Icons.person, color: Colors.white),
                   ),
                   const SizedBox(width: 10),
-                  Text(username),
+                  Text('User'), // You can add username if needed
                   const Spacer(),
-                  Text('Views: $views'), // Display the current view count
+                  Text('Views: ${viewCounts[widget.videos.indexOf({'title': title, 'thumbnail': thumbnailUrl, 'url': videoUrl})]}'), // Display the current view count
                   const SizedBox(width: 10),
                   ElevatedButton.icon(
                     onPressed: () {
                       setState(() {
-                        isFollowing[index] = !isFollowing[index];
+                        // Simulate a follow/unfollow functionality here
+                        isFollowing[0] = !isFollowing[0];
                       });
                     },
                     icon: Icon(
-                      isFollowing[index] ? Icons.person_remove : Icons.person_add,
+                      isFollowing[0] ? Icons.person_remove : Icons.person_add,
                       size: 16,
                     ),
-                    label: Text(isFollowing[index] ? 'Following' : 'Follow'),
+                    label: Text(isFollowing[0] ? 'Following' : 'Follow'),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: isFollowing[index]
+                      backgroundColor: isFollowing[0]
                           ? const Color.fromARGB(255, 54, 162, 244)
                           : Colors.green,
                     ),

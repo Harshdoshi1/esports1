@@ -4,16 +4,21 @@ import './screens/register.dart'; // Import the RegisterScreen
 import './screens/home.dart'; // Import the HomeScreen
 import './screens/forgotpass.dart'; // Import the ForgotPasswordScreen
 import './screens/create.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase core
+import 'firebase_options.dart'; // Import Firebase options for proper configuration
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform, // Ensure Firebase is initialized with the correct platform options
+    );
+    print("Firebase Initialized Successfully");
+  } catch (e) {
+    print("Error initializing Firebase: $e");
+  }
 
   runApp(const MyApp());
 }
@@ -27,14 +32,16 @@ class MyApp extends StatelessWidget {
       title: 'Flutter App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      initialRoute: '/create', // Set the initial route to LoginScreen
+      initialRoute: '/home', // Set the initial route to HomeScreen
       routes: {
-        '/login': (context) => const LoginScreen(), // Route for LoginScreen
-        '/register': (context) => const RegisterScreen(), // Route for RegisterScreen
-        '/home': (context) => const HomePage(), // Route for HomeScreen
-        '/forgotpass': (context) => const ForgotPasswordScreen(), // Route for ForgotPasswordScreen
-        '/create': (context) => const CreatePage(), // Route for ForgotPasswordScreen
-
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) {
+          final List<Map<String, String>> videos = []; // Initialize videos list here or fetch from Firebase
+          return HomePage(videos: videos);
+        },
+        '/forgotpass': (context) => const ForgotPasswordScreen(),
+        '/create': (context) => const CreatePage(),
       },
     );
   }

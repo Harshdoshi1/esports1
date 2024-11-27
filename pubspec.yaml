@@ -2,7 +2,7 @@ name: esports
 description: "A Flutter project for esports players."
 
 # Prevent accidental publishing to pub.dev
-publish_to: 'none' # Remove this line if you want to publish
+publish_to: 'none'  # Remove this line if you want to publish to pub.dev
 
 # Version and build number for your application
 version: 1.0.0+1
@@ -30,11 +30,11 @@ dependencies:
 
   # UI Enhancements
   google_fonts: ^6.2.1
-  fluttertoast: ^8.0.9 # Updated version for compatibility
-  cached_network_image: ^3.2.3 # Compatible version
+  fluttertoast: ^8.0.9  # Updated version for compatibility
+  cached_network_image: ^3.2.3  # Compatible version for caching images
 
   # Form validation
-  form_builder_validators: ^11.0.0 # Validation utilities
+  form_builder_validators: ^11.0.0  # Validation utilities for forms
 
   # HTTP requests
   http: ^1.2.0
@@ -42,19 +42,21 @@ dependencies:
   # Utilities
   shared_preferences: ^2.2.0
   intl: ^0.19.0
-  image_picker: ^1.1.2
+  image_picker: ^1.1.2  # Image picker for selecting images and videos
+  permission_handler: ^10.2.0  # Permission handler for runtime permissions
+  file_picker: ^8.1.4  # File picker for selecting files
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^5.0.0  # Lints for better code quality
 
 flutter:
   uses-material-design: true
 
-  # Assets (if you use any assets like images, fonts, etc.)
+  # Assets (images, fonts, etc.)
   assets:
-    - assets/images/ # All images in this folder
+    - assets/images/  # All images in this folder
     # Add more images here as needed
 
   # Fonts (if you plan to include custom fonts)

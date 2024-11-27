@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // For picking images
+import 'package:image_picker/image_picker.dart'; // For picking images and videos
 import 'dart:io'; // For file operations
 import 'package:firebase_storage/firebase_storage.dart'; // For Firebase Storage
-import 'package:path/path.dart' as path;
-
-import 'home.dart'; // For getting file names
+import 'package:path/path.dart' as path; // To get the file name from the path
+import 'package:firebase_core/firebase_core.dart'; // To ensure Firebase is initialized
+import './home.dart'; // Import HomePage for navigation
 
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
@@ -14,26 +14,11 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  int _selectedIndex = 2; // Set the default selected tab to "Create"
-  TextEditingController _videoTitleController = TextEditingController();
+  final TextEditingController _videoTitleController = TextEditingController();
   File? _videoFile; // Holds the video file
   File? _thumbnailFile; // Holds the thumbnail image file
   bool _isUploading = false; // Upload status
-
-  // Navigation handler
-  void _onItemTapped(int index) {
-    if (index == 0) {
-      // Redirect to Home Page
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
+  int _selectedIndex = 2; // Default to "Create" page
 
   // Video picker
   Future<void> _pickVideo() async {
@@ -74,34 +59,27 @@ class _CreatePageState extends State<CreatePage> {
 
     try {
       // Upload video to Firebase Storage
-      final videoFileName = path.basename(_videoFile!.path); // Correct usage of basename
+      final videoFileName = path.basename(_videoFile!.path); // Get file name from path
       final videoRef = FirebaseStorage.instance.ref().child('videos/$videoFileName');
-      await videoRef.putFile(_videoFile!);
-      final videoUrl = await videoRef.getDownloadURL();
+      await videoRef.putFile(_videoFile!); // Upload the video
+      final videoUrl = await videoRef.getDownloadURL(); // Get video URL after upload
 
       // Upload thumbnail to Firebase Storage
-      final thumbnailFileName = path.basename(_thumbnailFile!.path);
+      final thumbnailFileName = path.basename(_thumbnailFile!.path); // Get thumbnail file name
       final thumbnailRef = FirebaseStorage.instance.ref().child('thumbnails/$thumbnailFileName');
-      await thumbnailRef.putFile(_thumbnailFile!);
-      final thumbnailUrl = await thumbnailRef.getDownloadURL();
+      await thumbnailRef.putFile(_thumbnailFile!); // Upload the thumbnail
+      final thumbnailUrl = await thumbnailRef.getDownloadURL(); // Get thumbnail URL after upload
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Video and thumbnail uploaded successfully!')),
-      );
-
-      // Reset state after upload
-      setState(() {
-        _videoFile = null;
-        _thumbnailFile = null;
-        _videoTitleController.clear();
+      // Navigate back to HomePage and pass the new video data
+      Navigator.pop(context, {
+        'title': _videoTitleController.text,
+        'thumbnail': thumbnailUrl,
+        'url': videoUrl,
       });
 
-      print('Video URL: $videoUrl');
-      print('Thumbnail URL: $thumbnailUrl');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Upload failed: $e')),
+        SnackBar(content: Text('Error uploading video: $e')),
       );
     } finally {
       setState(() {
@@ -110,130 +88,72 @@ class _CreatePageState extends State<CreatePage> {
     }
   }
 
+  // Handle item selection in BottomNavigationBar
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if (index == 2) {
+      // Stay on the "Create" page
+      return;
+    } else {
+      // Navigate to HomePage when Home or other tab is clicked
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage(videos: [])), // Pass appropriate data
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
-        ),
-        title: SizedBox(
-          height: 40,
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search...',
-              prefixIcon: const Icon(Icons.search, color: Color.fromARGB(255, 116, 116, 116)),
-              filled: true,
-              fillColor: Colors.grey[200],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+        title: const Text('Upload Video'),
+        backgroundColor: Colors.blue,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _videoTitleController,
+              decoration: const InputDecoration(
+                labelText: 'Video Title',
               ),
             ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Add Video',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: _pickVideo,
-                child: Container(
-                  width: double.infinity,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _pickVideo,
+              child: const Text('Pick Video'),
+            ),
+            const SizedBox(height: 10),
+            _videoFile != null
+                ? Text('Video Selected: ${_videoFile!.path.split('/').last}')
+                : const Text('No video selected'),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _pickThumbnail,
+              child: const Text('Pick Thumbnail'),
+            ),
+            const SizedBox(height: 10),
+            _thumbnailFile != null
+                ? Text('Thumbnail Selected: ${_thumbnailFile!.path.split('/').last}')
+                : const Text('No thumbnail selected'),
+            const SizedBox(height: 20),
+            _isUploading
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: () => _uploadFiles(context),
+                    child: const Text('Upload Video'),
                   ),
-                  child: Center(
-                    child: _videoFile == null
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.upload_file, size: 40, color: Colors.grey),
-                              Text(
-                                'Tap to upload video',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          )
-                        : Text('Video selected: ${path.basename(_videoFile!.path)}'),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text('Add Video Title'),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _videoTitleController,
-                decoration: InputDecoration(
-                  hintText: 'Enter a title for your video',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Upload Thumbnail',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: _pickThumbnail,
-                child: Container(
-                  width: double.infinity,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: _thumbnailFile == null
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.image, size: 40, color: Colors.grey),
-                              SizedBox(height: 10),
-                              Text(
-                                'Tap to upload thumbnail',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        )
-                      : Image.file(
-                          _thumbnailFile!,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _isUploading ? null : () => _uploadFiles(context),
-                child: _isUploading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                    : const Text('Add'),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Colors.blue, // Active icon color
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(
