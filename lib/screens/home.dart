@@ -1,46 +1,44 @@
 import 'package:flutter/material.dart';
 import 'create.dart'; // Import CreatePage here
+import 'community.dart'; // Import CommunityPage here
 
 class HomePage extends StatefulWidget {
-  final List<Map<String, String>> videos; // Accept list of video data
+  final List<Map<String, String>> videos;
 
-  const HomePage({super.key, required this.videos}); // Constructor to receive videos
+  const HomePage({super.key, required this.videos});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0; // Index of the active navigation bar item
-  List<bool> isFollowing = [false, false]; // For two gamers in this example
-  List<int> viewCounts = [0, 0]; // Initializing view count for each gamer
+  int _selectedIndex = 0;
 
-  // Handle item selection in BottomNavigationBar
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 2) {
+    if (index == 1) {
+      // Navigate to CommunityPage when "Community" is clicked
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CommunityPage()),
+      );
+    } else if (index == 2) {
       // Navigate to CreatePage when "Create" is clicked
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const CreatePage()),
       ).then((newVideo) {
         if (newVideo != null) {
-          // Add the new video data to the list and update the UI
           setState(() {
             widget.videos.add(newVideo);
           });
         }
       });
+    } else {
+      // Handle other navigation
+      setState(() {
+        _selectedIndex = index;
+      });
     }
-  }
-
-  // Increment view count for a video
-  void _incrementViewCount(int index) {
-    setState(() {
-      viewCounts[index] += 1; // Increment the view count
-    });
   }
 
   @override
@@ -71,7 +69,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: widget.videos.isEmpty
-            ? [Center(child: Text("No videos yet!"))] // Display a message if there are no videos
+            ? [const Center(child: Text("No videos yet!"))]
             : widget.videos.map((video) {
                 return buildVideoCard(video['title']!, video['thumbnail']!, video['url']!);
               }).toList(),
@@ -79,7 +77,7 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.blue, // Active icon color
+        selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(
@@ -103,7 +101,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Method to build the individual video card with title below video
   Widget buildVideoCard(String title, String thumbnailUrl, String videoUrl) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -112,9 +109,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             GestureDetector(
               onTap: () {
-                // This is where you can add functionality for tapping the video
                 print('Video tapped: $title');
-                // You can add code to navigate to a video detail page or play video here
               },
               child: Image.network(
                 thumbnailUrl,
@@ -122,7 +117,6 @@ class _HomePageState extends State<HomePage> {
                     const Icon(Icons.broken_image, size: 100),
               ),
             ),
-            // Display video title below the image
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
@@ -142,27 +136,17 @@ class _HomePageState extends State<HomePage> {
                     child: Icon(Icons.person, color: Colors.white),
                   ),
                   const SizedBox(width: 10),
-                  Text('User'), // You can add username if needed
+                  const Text('User'),
                   const Spacer(),
-                  Text('Views: ${viewCounts[widget.videos.indexOf({'title': title, 'thumbnail': thumbnailUrl, 'url': videoUrl})]}'), // Display the current view count
+                  const Text('Views: 0'),
                   const SizedBox(width: 10),
                   ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        // Simulate a follow/unfollow functionality here
-                        isFollowing[0] = !isFollowing[0];
-                      });
-                    },
-                    icon: Icon(
-                      isFollowing[0] ? Icons.person_remove : Icons.person_add,
-                      size: 16,
-                    ),
-                    label: Text(isFollowing[0] ? 'Following' : 'Follow'),
+                    onPressed: () {},
+                    icon: const Icon(Icons.person_add, size: 16),
+                    label: const Text('Follow'),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: isFollowing[0]
-                          ? const Color.fromARGB(255, 54, 162, 244)
-                          : Colors.green,
+                      backgroundColor: Colors.green,
                     ),
                   ),
                 ],

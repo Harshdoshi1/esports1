@@ -3,8 +3,8 @@ import 'package:image_picker/image_picker.dart'; // For picking images and video
 import 'dart:io'; // For file operations
 import 'package:firebase_storage/firebase_storage.dart'; // For Firebase Storage
 import 'package:path/path.dart' as path; // To get the file name from the path
-import 'package:firebase_core/firebase_core.dart'; // To ensure Firebase is initialized
-import './home.dart'; // Import HomePage for navigation
+import './home.dart';
+import 'community.dart'; // Import HomePage for navigation
 
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
@@ -93,10 +93,17 @@ class _CreatePageState extends State<CreatePage> {
     setState(() {
       _selectedIndex = index;
     });
-    if (index == 2) {
+    if (index == 1) {
+      // Navigate to CommunityPage when "Community" is clicked
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CommunityPage()),
+      );
+    } else if (index == 2) {
       // Stay on the "Create" page
       return;
-    } else {
+    } 
+    else {
       // Navigate to HomePage when Home or other tab is clicked
       Navigator.push(
         context,

@@ -4,6 +4,7 @@ import './screens/register.dart'; // Import the RegisterScreen
 import './screens/home.dart'; // Import the HomeScreen
 import './screens/forgotpass.dart'; // Import the ForgotPasswordScreen
 import './screens/create.dart';
+import './screens/community.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase core
 import 'firebase_options.dart'; // Import Firebase options for proper configuration
 
@@ -42,6 +43,8 @@ class MyApp extends StatelessWidget {
         },
         '/forgotpass': (context) => const ForgotPasswordScreen(),
         '/create': (context) => const CreatePage(),
+        '/community': (context) => const CommunityPage(),
+        
       },
     );
   }
